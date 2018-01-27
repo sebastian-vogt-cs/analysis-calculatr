@@ -1,5 +1,6 @@
 use std::io;
 use std::io::Write;
+mod function_parser;
 
 fn main() {
 
@@ -32,20 +33,9 @@ fn parse_command(input:&str){
     match command {
         "help" => print_output("define a function like that: f(x) = x, only
             one-character function names are allowed"), //prints help
-        "(x) = " => define_function(input), //sends input to define_function func
+        "(x) = " => print_output(function_parser::parse_function(input).as_str()), //sends input to define_function func
         _ => print_output("command not found"),
     }
-}
-
-//this func defines what to do when user enter a function
-fn define_function(input:&str){
-
-    //prints the name of the function, just for development
-    let name = &input[0..1];
-    let mut message:String = name.to_string();
-    message.push_str(" is the name of your function");
-    print_output(&message);
-
 }
 
 //function to define all outputs, is a sepeate function to be able to swiftly change
