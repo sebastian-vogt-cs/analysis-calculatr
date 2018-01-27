@@ -1,0 +1,6 @@
+[package]
+name = "analysis-calculatr"
+version = "0.1.0"
+authors = ["sebastian"]
+
+[dependencies]
