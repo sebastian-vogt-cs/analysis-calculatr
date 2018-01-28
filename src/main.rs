@@ -16,14 +16,14 @@ fn main() {
         io::stdin().read_line(&mut input).ok().expect("error");
         input.pop();
         //sned input to the command parser
-        parse_command(&input);
+        interpret_command(&input);
 
     }
 
 }
 
 //command parser
-fn parse_command(input:&str){
+fn interpret_command(input:&str){
     let command:&str;
     if input.len() > 6 {
         command = &input[1..7];
@@ -33,7 +33,7 @@ fn parse_command(input:&str){
     match command {
         "help" => print_output("define a function like that: f(x) = x, only
             one-character function names are allowed"), //prints help
-        "(x) = " => print_output(function_parser::parse_function(input).as_str()), //sends input to define_function func
+        "(x) = " => print_output(&function_parser::func_to_string(function_parser::parse_function(input))), //sends input to define_function func
         _ => print_output("command not found"),
     }
 }
