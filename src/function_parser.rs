@@ -70,7 +70,7 @@ pub fn parse_function(input:&str) -> Vec<(i8, u32, u32)>{
     }
 }
 
-pub fn func_to_string(func:Vec<(i8, u32, u32)>)->String{
+pub fn func_to_string(func:&Vec<(i8, u32, u32)>)->String{
     let mut func_string:String = String::new();
     for i in 0 .. (func.len()) {
         if func[i].0 != 1 {
