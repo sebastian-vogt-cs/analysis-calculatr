@@ -12,14 +12,14 @@ pub fn parse_function(input:&str) -> Vec<(i8, u32, u32)>{
             0 =>{
                 match c {
                     '-' => {state = 6; memory = (-1, 1, 0)},
-                    'x' => {state = 2; memory = (memory.0, 1, 0)},
+                    'x' => {state = 2; memory = (memory.0, 1, 1)},
                     '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {state = 3; memory = (memory.0, c.to_digit(10).unwrap() as u32, 0)},
                     _ => {state = 7; break;},
                 }
             }
             1 =>{
                 match c {
-                    'x' => {state = 2; memory = (memory.0, 1, 0)},
+                    'x' => {state = 2; memory = (memory.0, 1, 1)},
                     '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {state = 3; memory = (memory.0, c.to_digit(10).unwrap() as u32, 0)},
                     _ => {state = 7; break;},
                 }
@@ -34,7 +34,7 @@ pub fn parse_function(input:&str) -> Vec<(i8, u32, u32)>{
             3 =>{
                 match c {
                     ' ' => {state = 5; memory = (memory.0, memory.1, 0); polynomal_representation.push(memory)},
-                    'x' => state = 2,
+                    'x' => {state = 2; memory = (memory.0, memory.1, 1);}
                     '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => {state = 3; memory = (memory.0, memory.1*10 + c.to_digit(10).unwrap() as u32, 0)},
                     _ => {state = 7; break;},
                 }
