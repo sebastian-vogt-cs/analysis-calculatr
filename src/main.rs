@@ -35,14 +35,27 @@ fn main() {
             }else{
                 print_output("this function is not defined");
             }
+        }else if result == 4{ //get value
+            if let Some(value) = functions.get(&input[10..11]) { //search for function in memory
+                let mut x:i16 = 0;
+                for c in input[12..input.len()-1].chars(){
+                    match c{
+                        '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => x = x*10 + c.to_digit(10).unwrap() as i16,
+                        _ => x = 0,
+                    }
+                }
+                print_output(&fmath::get_y_for(x, &value).to_string());
+            }else{
+                print_output("this function is not defined");
+            }
         }
 
     }
 
 }
 
-//command parser
-fn interpret_command(input:&str)->u8{ //returns a "status" (0 = do nothing, 1 = store function, 2 = print function, 3 = derive)
+//interpret command
+fn interpret_command(input:&str)->u8{ //returns a "status" (0 = do nothing, 1 = store function, 2 = print function, 3 = derive, 4 = get value)
     let command:&str;
     if input.len() > 7{
         command = &input[1..7]; //cut the first letter, so we don't need to define a "define function" command for the entire alphabet (f(x), g(x),...)
@@ -53,7 +66,8 @@ fn interpret_command(input:&str)->u8{ //returns a "status" (0 = do nothing, 1 = 
         "elp" => {print_output("define a function like that: f(x) = x, only one-character function names are allowed"); 0}, //prints help for help, yelp... (fix in future)
         "(x) = " => 1, //define function and store
         "(x)" => 2, //print function if exists
-        "erive " => 3,
+        "erive " => 3, //derive
+        "et_val" => 4, //example: get_value f(3)
         _ => {print_output("command not found"); 0},
     }
 }
