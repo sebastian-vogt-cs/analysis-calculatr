@@ -20,25 +20,27 @@ fn main() {
 
         //send input to the command parser and execute the command
         let result:u8 = interpret_command(&input);
-        if result == 1{ //store function
+        if result == 10{
+            print_output("define a function like that: f(x) = x, only one-character function names are allowed");
+        }else if result == 30{ //store function
             functions.insert(input[0..1].to_string(), function_parser::parse_function(&input));
             print_output("this function was saved to memory");
-        }else if result == 2{ //print function
+        }else if result == 20{ //print function
             if let Some(value) = functions.get(&input[0..1]) { //search for function in memory
                 print_output(&function_parser::func_to_string(value));
             }else{
                 print_output("this function is not defined");
             }
-        }else if result == 3{ //derive function
+        }else if result == 60{ //derive function
             if let Some(value) = functions.get(&input[7..input.len()-3]) { //search for function in memory
                 print_output(&function_parser::func_to_string(&fmath::derive(value)));
             }else{
                 print_output("this function is not defined");
             }
-        }else if result == 4{ //get value
-            if let Some(value) = functions.get(&input[10..11]) { //search for function in memory
+        }else if result == 40{ //get value
+            if let Some(value) = functions.get(&input[0..1]) { //search for function in memory
                 let mut x:i16 = 0;
-                for c in input[12..input.len()-1].chars(){
+                for c in input[2..input.len()-1].chars(){
                     match c{
                         '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => x = x*10 + c.to_digit(10).unwrap() as i16,
                         _ => x = 0,
@@ -48,28 +50,89 @@ fn main() {
             }else{
                 print_output("this function is not defined");
             }
+        }else if result == 100{
+            print_output("command not found");
         }
 
     }
 
 }
 
-//interpret command
-fn interpret_command(input:&str)->u8{ //returns a "status" (0 = do nothing, 1 = store function, 2 = print function, 3 = derive, 4 = get value)
-    let command:&str;
-    if input.len() > 7{
-        command = &input[1..7]; //cut the first letter, so we don't need to define a "define function" command for the entire alphabet (f(x), g(x),...)
+fn interpret_command(input:&str)->u8{//what the returns mean: 10 = print help, 20 = print function, 30 = store function, 40 = get value, 60 = derive
+    let mut state:u8 = 0;
+    if (input.len() > 10) && (&input[0..6] == "derive"){
+        state = 60;
+    }else if &input[0..input.len()] == "help"{
+        state = 10;
     }else{
-        command = &input[1..input.len()];
+        for c in input.chars(){
+            match state{
+                0 => {
+                    match c{
+                        'q'|'w'|'e'|'r'|'t'|'z'|'u'|'i'|'o'|'p'|'a'|'s'|'f'|'g'|'j'|'k'|'l'|'y'|'c'|'v'|'b'|'n'|'m'|'h'|'d' => state = 11,
+                        _ => {state = 100; break;},
+                    }
+                },
+                11 => {
+                    match c{
+                        '(' => state = 12,
+                        _ => {state = 100; break;},
+                    }
+                },
+                12 => {
+                    match c{
+                        '1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'0' => state = 31,
+                        'x' => state = 13,
+                        _ => {state = 100; break;},
+                    }
+                },
+                13 => {
+                    match c{
+                        ')' => state = 20,
+                        _ => {state = 100; break;},
+                    }
+                },
+                20 => {
+                    match c{
+                        ' ' => state = 21,
+                        _ => {state = 100; break;},
+                    }
+                },
+                21 => {
+                    match c{
+                        '=' => state = 22,
+                        _ => {state = 100; break;},
+                    }
+                },
+                22 => {
+                    match c{
+                        ' ' => state = 30,
+                        _ => {state = 100; break;},
+                    }
+                },
+                30 => {
+                    match c{
+                        '1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'0'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|' '|'+'|'-'|'x' => state = 30,
+                        _ => {state = 100; break;},
+                    }
+                },
+                31 => {
+                    match c{
+                        '1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'0' => state = 31,
+                        ')' => state = 40,
+                        _ => {state = 100; break;},
+                    }
+                },
+                40 => {
+                    match c{
+                        _ => {state = 100; break;},
+                    }
+                },
+                _ => break,
+            }
+        }
     }
-    match command {
-        "elp" => {print_output("define a function like that: f(x) = x, only one-character function names are allowed"); 0}, //prints help for help, yelp... (fix in future)
-        "(x) = " => 1, //define function and store
-        "(x)" => 2, //print function if exists
-        "erive " => 3, //derive
-        "et_val" => 4, //example: get_value f(3)
-        _ => {print_output("command not found"); 0},
-    }
+    state
 }
 
 //function to define all outputs, is a sepeate function to be able to swiftly change
