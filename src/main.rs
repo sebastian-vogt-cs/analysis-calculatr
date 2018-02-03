@@ -5,7 +5,7 @@ mod function_parser;
 mod fmath;
 
 fn main() {
-
+    
     println!("Welcome to the analysis-calculatr, type help for help");
     let mut functions = HashMap::new(); //here all the functions the user enter are stored in
     //this infinite loop provides the command-line interface of the application
@@ -39,14 +39,26 @@ fn main() {
             }
         }else if result == 40{ //get value
             if let Some(value) = functions.get(&input[0..1]) { //search for function in memory
-                let mut x:i16 = 0;
+                let mut x:f64 = 0.0;
                 for c in input[2..input.len()-1].chars(){
                     match c{
-                        '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => x = x*10 + c.to_digit(10).unwrap() as i16,
-                        _ => x = 0,
+                        '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => x = x*10.0 + c.to_digit(10).unwrap() as f64,
+                        _ => x = 0.0,
                     }
                 }
                 print_output(&fmath::get_y_for(x, &value).to_string());
+            }else{
+                print_output("this function is not defined");
+            }
+        }else if result == 70{
+            if let Some(value) = functions.get(&input[6..input.len()-3]) { //search for function in memory
+                let zeros:Vec<f64> = fmath::get_zeros(value);
+                let mut result:String = "".to_string();
+                for zero in zeros{
+                    result.push_str(&zero.to_string());
+                    result.push_str(&" ");
+                }
+                print_output(&result);
             }else{
                 print_output("this function is not defined");
             }
@@ -58,10 +70,12 @@ fn main() {
 
 }
 
-fn interpret_command(input:&str)->u8{//what the returns mean: 10 = print help, 20 = print function, 30 = store function, 40 = get value, 60 = derive
+fn interpret_command(input:&str)->u8{//what the returns mean: 10 = print help, 20 = print function, 30 = store function, 40 = get value, 60 = derive, 70 = zeros
     let mut state:u8 = 0;
     if (input.len() > 10) && (&input[0..6] == "derive"){
         state = 60;
+    }else if (input.len() > 9) && (&input[0..5] == "zeros"){
+        state = 70;
     }else if &input[0..input.len()] == "help"{
         state = 10;
     }else{
