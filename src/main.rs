@@ -23,8 +23,13 @@ fn main() {
         if result == 10{
             print_output("define a function like that: f(x) = x, only one-character function names are allowed");
         }else if result == 30{ //store function
-            functions.insert(input[0..1].to_string(), function_parser::parse_function(&input));
-            print_output("this function was saved to memory");
+            let response:(Vec<(i8, f64, usize)>, bool) = function_parser::parse_function(&input);
+            if response.1{
+                functions.insert(input[0..1].to_string(), response.0);
+                print_output("this function was saved to memory");
+            }else{
+                print_output("this function is not in supported notation");
+            }
         }else if result == 20{ //print function
             if let Some(value) = functions.get(&input[0..1]) { //search for function in memory
                 print_output(&function_parser::func_to_string(value));
@@ -126,13 +131,13 @@ fn interpret_command(input:&str)->u8{//what the returns mean: 10 = print help, 2
                 },
                 30 => {
                     match c{
-                        '1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'0'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|' '|'+'|'-'|'x' => state = 30,
+                        '1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'0'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|' '|'+'|'-'|'x' | '.' => state = 30,
                         _ => {state = 100; break;},
                     }
                 },
                 31 => {
                     match c{
-                        '1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'0' => state = 31,
+                        '1'|'2'|'3'|'4'|'5'|'6'|'7'|'8'|'9'|'0' | '.' => state = 31,
                         ')' => state = 40,
                         _ => {state = 100; break;},
                     }

@@ -1,7 +1,7 @@
 //this func checks weather or not the function is a correctly entered polynomal function and maps the function in a usable way into a Vec
 //the resulting Vec consist of a tuple for each term, the tuple consists of the multiplicant a and the power n (ax^n)
 //the parser is basically a deterministic finite state machine, draw it up in a diagramm to understand it.
-pub fn parse_function(input:&str) -> Vec<(i8, f64, usize)>{
+pub fn parse_function(input:&str) -> (Vec<(i8, f64, usize)>, bool){
     let mut state:u8 = 0;
     let function:&str = &input[7..input.len()];
     let mut polynomal_representation:Vec<(i8, f64, usize)> = Vec::new();
@@ -14,7 +14,7 @@ pub fn parse_function(input:&str) -> Vec<(i8, f64, usize)>{
                 match c {
                     '-' => {state = 6; memory = (-1, 1.0, 0)},
                     'x' => {state = 2; memory = (memory.0, 1.0, 1)},
-                    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {state = 3; memory = (memory.0, c.to_digit(10).unwrap() as f64, 0)},
+                    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => {state = 3; memory = (memory.0, c.to_digit(10).unwrap() as f64, 0)},
                     _ => {state = 8; break;},
                 }
             }
@@ -81,9 +81,9 @@ pub fn parse_function(input:&str) -> Vec<(i8, f64, usize)>{
     }
     polynomal_representation.push(memory);
     if (state == 2) | (state == 3) | (state == 4) | (state == 7) {
-        polynomal_representation
+        (polynomal_representation, true)
     }else{
-        Vec::new()
+        (Vec::new(), false)
     }
 }
 
