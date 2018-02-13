@@ -81,7 +81,7 @@ pub fn parse_function(input:&str) -> (Vec<(i8, f64, usize)>, bool){
     }
     polynomal_representation.push(memory);
     if (state == 2) | (state == 3) | (state == 4) | (state == 7) {
-        (polynomal_representation, true)
+        (sort(polynomal_representation), true)
     }else{
         (Vec::new(), false)
     }
@@ -140,4 +140,79 @@ fn usize_to_superscript(num:usize)->String{
         }
     }
     result
+}
+
+fn sort(func:Vec<(i8, f64, usize)>)->Vec<(i8, f64, usize)>{
+    let mut sorter:Vec<Vec<(i8, f64, usize)>> = Vec::new();
+    sorter.push(func.clone());
+    loop{
+        if func.len() == sorter.len(){
+            break;
+        }
+        let mut new_sorter:Vec<Vec<(i8, f64, usize)>> = Vec::new();
+        for vec in sorter{
+            if vec.len() == 1{
+                new_sorter.push(vec);
+                continue;
+            }
+            let middle = vec[vec.len()/2].2 as usize;
+            let mut vec1:Vec<(i8, f64, usize)> = Vec::new();
+            let mut vec2:Vec<(i8, f64, usize)> = Vec::new();
+            let mut middle_counter = false;
+            for (sign, a, n) in vec{
+                if n > middle{
+                    vec1.push((sign, a, n));
+                }else if n < middle{
+                    vec2.push((sign, a, n));
+                }else if (n == middle) && (vec1.len() == 0) && !middle_counter{
+                    vec1.push((sign, a, n));
+                    middle_counter = true
+                }else{
+                    vec2.push((sign, a, n));
+                }
+            }
+            new_sorter.push(vec1);
+            new_sorter.push(vec2);
+        }
+        sorter = new_sorter;
+    }
+    let mut result:Vec<(i8, f64, usize)> = Vec::new();
+    for vec in sorter{
+        for (sign, a, n) in vec{
+            result.push((sign, a, n));
+        }
+    }
+    merge(result)
+}
+
+fn merge(func:Vec<(i8, f64, usize)>)->Vec<(i8, f64, usize)>{
+    let mut merged:Vec<(i8, f64, usize)> = Vec::new();
+    for (sign, a, n) in func{
+        if merged.len() == 0{
+            merged.push((sign, a, n));
+            continue;
+        }
+        let index = merged.len()-1;
+        if n == merged[index].2{
+            if (sign == -1) && (merged[index].0 == -1){
+                merged[index] = (-1, a + merged[index].1, n);
+            }else if (sign == 1) && (merged[index].0 == 1){
+                merged[index] = (1, a + merged[index].1, n);
+            }else{
+                let mut new_a = sign as f64 * a + merged[index].0 as f64 * merged[index].1;
+                let mut new_sign = 1;
+                if new_a < 0.0{
+                    new_sign = -1;
+                    new_a = new_a + ((-2.0) * new_a);
+                }else if new_a == 0.0{
+                    merged.remove(index);
+                    continue;
+                }
+                merged[index] = (new_sign, new_a, n);
+            }
+        }else{
+            merged.push((sign, a, n));
+        }
+    }
+    merged
 }
