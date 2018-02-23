@@ -1,6 +1,6 @@
-pub fn derive(func:&Vec<(i8, f64, usize)>)->Vec<(i8, f64, usize)>{
-    let mut new_func:Vec<(i8, f64, usize)> = Vec::new();
-    let mut memory:(i8, f64, usize) = (1, 0.0, 0);
+pub fn derive(func:&Vec<(bool, f64, usize)>)->Vec<(bool, f64, usize)>{
+    let mut new_func:Vec<(bool, f64, usize)> = Vec::new();
+    let mut memory:(bool, f64, usize) = (true, 0.0, 0);
     for &(sign, a, n) in func{
         if n >= 1{
             memory.2 = n - 1;
@@ -12,16 +12,20 @@ pub fn derive(func:&Vec<(i8, f64, usize)>)->Vec<(i8, f64, usize)>{
     new_func
 }
 
-pub fn get_y_for(x:f64, func:&Vec<(i8, f64, usize)>)->f64{
+pub fn get_y_for(x:f64, func:&Vec<(bool, f64, usize)>)->f64{
     let mut result:f64 = 0.0;
     for &(sign, a, n) in func{
-        result = result + ((sign as f64) * (a as f64) * x.powf(n as f64));
+        result = if sign {
+            result + ((a as f64) * x.powf(n as f64))
+        }else{
+            result + ((a as f64) * x.powf(n as f64))
+        };
     }
     result
 }
 
-pub fn get_zeros(func:&Vec<(i8, f64, usize)>)->Vec<f64>{
-    let derivative:Vec<(i8, f64, usize)> = derive(func);
+pub fn get_zeros(func:&Vec<(bool, f64, usize)>)->Vec<f64>{
+    let derivative:Vec<(bool, f64, usize)> = derive(func);
     let mut zeros:Vec<f64> = Vec::new();
     let mut border:f64 = 0.0;
     let mut i:usize = 0;
@@ -48,9 +52,9 @@ pub fn get_zeros(func:&Vec<(i8, f64, usize)>)->Vec<f64>{
     zeros
 }
 
-fn newton_alg(x_start:f64, func:&Vec<(i8, f64, usize)>)->f64{
+fn newton_alg(x_start:f64, func:&Vec<(bool, f64, usize)>)->f64{
     let mut x:f64 = x_start;
-    let derivative:Vec<(i8, f64, usize)> = derive(func);
+    let derivative:Vec<(bool, f64, usize)> = derive(func);
     for _i in 0..10000{
         x = x - (get_y_for(x, func)/get_y_for(x, &derivative));
     }

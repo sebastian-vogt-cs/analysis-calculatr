@@ -1,18 +1,18 @@
 //this func checks weather or not the function is a correctly entered polynomal function and maps the function in a usable way into a Vec
 //the resulting Vec consist of a tuple for each term, the tuple consists of the multiplicant a and the power n (ax^n)
 //the parser is basically a deterministic finite state machine, draw it up in a diagramm to understand it.
-pub fn parse_function(input:&str) -> (Vec<(i8, f64, usize)>, bool){
+pub fn parse_function(input:&str) -> (Vec<(bool, f64, usize)>, bool){
     let mut state:u8 = 0;
     let function:&str = &input[7..input.len()];
-    let mut polynomal_representation:Vec<(i8, f64, usize)> = Vec::new();
-    let mut memory:(i8, f64, usize) = (1, 0.0, 0);
+    let mut polynomal_representation:Vec<(bool, f64, usize)> = Vec::new();
+    let mut memory:(bool, f64, usize) = (true, 0.0, 0);
     let mut dezplace:usize = 10;
 
     for c in function.chars() {
         match state {
             0 =>{
                 match c {
-                    '-' => {state = 6; memory = (-1, 1.0, 0)},
+                    '-' => {state = 6; memory = (false, 1.0, 0)},
                     'x' => {state = 2; memory = (memory.0, 1.0, 1)},
                     '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => {state = 3; memory = (memory.0, c.to_digit(10).unwrap() as f64, 0)},
                     _ => {state = 8; break;},
@@ -54,8 +54,8 @@ pub fn parse_function(input:&str) -> (Vec<(i8, f64, usize)>, bool){
             }
             5 =>{
                 match c {
-                    '+' => {state = 6; memory = (1, 0.0, 0)},
-                    '-' => {state = 6; memory = (-1, 0.0, 0)},
+                    '+' => {state = 6; memory = (true, 0.0, 0)},
+                    '-' => {state = 6; memory = (false, 0.0, 0)},
                     _ => {state = 8; break;},
                 }
             }
@@ -87,17 +87,23 @@ pub fn parse_function(input:&str) -> (Vec<(i8, f64, usize)>, bool){
     }
 }
 
-pub fn func_to_string(func:&Vec<(i8, f64, usize)>)->String{
+pub fn func_to_string(func:&Vec<(bool, f64, usize)>)->String{
     let mut func_string:String = String::new();
     for i in 0 .. (func.len()) {
-        if func[i].0 != 1 {
+        if !func[i].0 {
             func_string.push_str(" - ");
-        }else{
+        }else if i != 0{
             func_string.push_str(" + ");
         }
-        func_string.push_str(&func[i].1.to_string());
-        func_string.push('x');
-        func_string.push_str(&usize_to_superscript(func[i].2));
+        if !((func[i].1 == 1.0) && (func[i].2 != 0)){
+            func_string.push_str(&func[i].1.to_string());
+        }
+        if func[i].2 != 0{
+            func_string.push('x');
+            if func[i].2 != 1{
+                func_string.push_str(&usize_to_superscript(func[i].2));
+            }
+        }
     }
     func_string
 }
@@ -142,22 +148,22 @@ fn usize_to_superscript(num:usize)->String{
     result
 }
 
-fn sort(func:Vec<(i8, f64, usize)>)->Vec<(i8, f64, usize)>{
-    let mut sorter:Vec<Vec<(i8, f64, usize)>> = Vec::new();
+fn sort(func:Vec<(bool, f64, usize)>)->Vec<(bool, f64, usize)>{
+    let mut sorter:Vec<Vec<(bool, f64, usize)>> = Vec::new();
     sorter.push(func.clone());
     loop{
         if func.len() == sorter.len(){
             break;
         }
-        let mut new_sorter:Vec<Vec<(i8, f64, usize)>> = Vec::new();
+        let mut new_sorter:Vec<Vec<(bool, f64, usize)>> = Vec::new();
         for vec in sorter{
             if vec.len() == 1{
                 new_sorter.push(vec);
                 continue;
             }
             let middle = vec[vec.len()/2].2 as usize;
-            let mut vec1:Vec<(i8, f64, usize)> = Vec::new();
-            let mut vec2:Vec<(i8, f64, usize)> = Vec::new();
+            let mut vec1:Vec<(bool, f64, usize)> = Vec::new();
+            let mut vec2:Vec<(bool, f64, usize)> = Vec::new();
             let mut middle_counter = false;
             for (sign, a, n) in vec{
                 if n > middle{
@@ -176,7 +182,7 @@ fn sort(func:Vec<(i8, f64, usize)>)->Vec<(i8, f64, usize)>{
         }
         sorter = new_sorter;
     }
-    let mut result:Vec<(i8, f64, usize)> = Vec::new();
+    let mut result:Vec<(bool, f64, usize)> = Vec::new();
     for vec in sorter{
         for (sign, a, n) in vec{
             result.push((sign, a, n));
@@ -185,8 +191,8 @@ fn sort(func:Vec<(i8, f64, usize)>)->Vec<(i8, f64, usize)>{
     merge(result)
 }
 
-fn merge(func:Vec<(i8, f64, usize)>)->Vec<(i8, f64, usize)>{
-    let mut merged:Vec<(i8, f64, usize)> = Vec::new();
+fn merge(func:Vec<(bool, f64, usize)>)->Vec<(bool, f64, usize)>{
+    let mut merged:Vec<(bool, f64, usize)> = Vec::new();
     for (sign, a, n) in func{
         if merged.len() == 0{
             merged.push((sign, a, n));
@@ -194,15 +200,19 @@ fn merge(func:Vec<(i8, f64, usize)>)->Vec<(i8, f64, usize)>{
         }
         let index = merged.len()-1;
         if n == merged[index].2{
-            if (sign == -1) && (merged[index].0 == -1){
-                merged[index] = (-1, a + merged[index].1, n);
-            }else if (sign == 1) && (merged[index].0 == 1){
-                merged[index] = (1, a + merged[index].1, n);
+            if (!sign) && (!merged[index].0){
+                merged[index] = (false, a + merged[index].1, n);
+            }else if (sign) && (merged[index].0){
+                merged[index] = (true, a + merged[index].1, n);
             }else{
-                let mut new_a = sign as f64 * a + merged[index].0 as f64 * merged[index].1;
-                let mut new_sign = 1;
+                let mut new_a = if (sign && merged[index].0) || (!sign && !merged[index].0){
+                    a * merged[index].1
+                }else{
+                    - a * merged[index].1
+                };
+                let mut new_sign = true;
                 if new_a < 0.0{
-                    new_sign = -1;
+                    new_sign = false;
                     new_a = new_a + ((-2.0) * new_a);
                 }else if new_a == 0.0{
                     merged.remove(index);

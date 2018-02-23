@@ -23,7 +23,7 @@ fn main() {
         if result == 10{
             print_output("define a function like that: f(x) = x, only one-character function names are allowed");
         }else if result == 30{ //store function
-            let response:(Vec<(i8, f64, usize)>, bool) = function_parser::parse_function(&input);
+            let response:(Vec<(bool, f64, usize)>, bool) = function_parser::parse_function(&input);
             if response.1{
                 functions.insert(input[0..1].to_string(), response.0);
                 print_output("this function was saved to memory");
