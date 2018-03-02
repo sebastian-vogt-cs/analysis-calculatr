@@ -14,7 +14,7 @@ pub fn parse_function(input:&str) -> (Vec<(bool, f64, usize)>, bool){
                 match c {
                     '-' => {state = 6; memory = (false, 1.0, 0)},
                     'x' => {state = 2; memory = (memory.0, 1.0, 1)},
-                    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => {state = 3; memory = (memory.0, c.to_digit(10).unwrap() as f64, 0)},
+                    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => {state = 3; memory = (memory.0, c.to_digit(10).unwrap() as f64, 0); dezplace = 10},
                     _ => {state = 8; break;},
                 }
             }
