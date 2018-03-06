@@ -18,38 +18,26 @@ pub fn get_y_for(x:f64, func:&Vec<(bool, f64, usize)>)->f64{
         result = if sign {
             result + ((a as f64) * x.powf(n as f64))
         }else{
-            result + ((a as f64) * x.powf(n as f64))
+            result - ((a as f64) * x.powf(n as f64))
         };
     }
     result
 }
 
 pub fn get_zeros(func:&Vec<(bool, f64, usize)>)->Vec<f64>{
-    let derivative:Vec<(bool, f64, usize)> = derive(func);
-    let mut zeros:Vec<f64> = Vec::new();
-    let mut border:f64 = 0.0;
-    let mut i:usize = 0;
-    loop{
-        zeros.push(newton_alg(border + 1.0, func));
-        if border == newton_alg(zeros[i], &derivative){
-            border = 0.0;
-            i = 0;
-            loop{
-                zeros.push(newton_alg(border - 1.0, func));
-                if border == newton_alg(zeros[i], &derivative){
-                    break;
-                }else{
-                    border = newton_alg(zeros[i], &derivative);
-                    i = i + 1;
-                }
-            }
-            break;
-        }else{
-            border = newton_alg(zeros[i], &derivative);
-            i = i + 1;
+    let mut values:Vec<f64> = Vec::new();
+    if func[0].2 == 1{
+        values.push(newton_alg(0.0, func));
+        return values;
+    }else{
+        let extrema = get_zeros(&derive(func));
+        let last_extreme:f64 = extrema[extrema.len() - 1];
+        for x in extrema{
+            values.push(newton_alg(x - 1.0, func));
         }
+        values.push(newton_alg(last_extreme + 1.0, func));
     }
-    zeros
+    values
 }
 
 fn newton_alg(x_start:f64, func:&Vec<(bool, f64, usize)>)->f64{
