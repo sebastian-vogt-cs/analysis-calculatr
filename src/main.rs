@@ -44,13 +44,7 @@ fn main() {
             }
         }else if result == 40{ //get value
             if let Some(value) = functions.get(&input[0..1]) { //search for function in memory
-                let mut x:f64 = 0.0;
-                for c in input[2..input.len()-1].chars(){
-                    match c{
-                        '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => x = x*10.0 + c.to_digit(10).unwrap() as f64,
-                        _ => x = 0.0,
-                    }
-                }
+                let x:f64 = function_parser::get_f64_from_string(&input[2..input.len()-1]);
                 print_output(&fmath::get_y_for(x, &value).to_string());
             }else{
                 print_output("this function is not defined");

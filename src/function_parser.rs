@@ -226,3 +226,14 @@ fn merge(func:Vec<(bool, f64, usize)>)->Vec<(bool, f64, usize)>{
     }
     merged
 }
+
+pub fn get_f64_from_string(input:&str)->f64{
+    let mut x:f64 = 0.0;
+                for c in input.chars(){
+                    match c{
+                        '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => x = x*10.0 + c.to_digit(10).unwrap() as f64,
+                        _ => x = 0.0,
+                    }
+                }
+                x
+}
