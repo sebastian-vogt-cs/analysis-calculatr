@@ -4,10 +4,14 @@ use std::collections::HashMap;
 mod function_parser;
 mod fmath;
 
+
 fn main() {
     
     println!("Welcome to the analysis-calculatr, type help for help");
-    let mut functions = HashMap::new(); //here all the functions the user enter are stored in
+
+    //here all the functions the user enter are stored in
+    let mut functions = HashMap::new();
+
     //this infinite loop provides the command-line interface of the application
     loop{
 
@@ -18,11 +22,15 @@ fn main() {
         io::stdin().read_line(&mut input).ok().expect("error");
         input.pop();
 
-        //send input to the command parser and execute the command
+        //send input to the command parser
         let result:u8 = interpret_command(&input);
+
+        //execute the command: print help
         if result == 10{
             print_output("define a function like that: f(x) = x, only one-character function names are allowed");
-        }else if result == 30{ //store function
+
+        //store function
+        }else if result == 30{
             let response:(Vec<(bool, f64, usize)>, bool) = function_parser::parse_function(&input);
             if response.1{
                 functions.insert(input[0..1].to_string(), response.0);
@@ -30,27 +38,37 @@ fn main() {
             }else{
                 print_output("this function is not in supported notation");
             }
-        }else if result == 20{ //print function
+
+         //print function
+        }else if result == 20{
             if let Some(value) = functions.get(&input[0..1]) { //search for function in memory
                 print_output(&function_parser::func_to_string(value));
             }else{
                 print_output("this function is not defined");
             }
-        }else if result == 60{ //derive function
+
+        //derive function
+        }else if result == 60{
             if let Some(value) = functions.get(&input[7..input.len()-3]) { //search for function in memory
                 print_output(&function_parser::func_to_string(&fmath::derive(value)));
             }else{
                 print_output("this function is not defined");
             }
-        }else if result == 40{ //get value
-            if let Some(value) = functions.get(&input[0..1]) { //search for function in memory
+
+        //get value
+        }else if result == 40{
+            //search for function in memory
+            if let Some(value) = functions.get(&input[0..1]) {
                 let x:f64 = function_parser::get_f64_from_string(&input[2..input.len()-1]);
                 print_output(&fmath::get_y_for(x, &value).to_string());
             }else{
                 print_output("this function is not defined");
             }
+
+        //calculate zeros
         }else if result == 70{
-            if let Some(value) = functions.get(&input[6..input.len()-3]) { //search for function in memory
+            //search for function in memory
+            if let Some(value) = functions.get(&input[6..input.len()-3]) {
                 let zeros:Vec<f64> = fmath::get_zeros(value);
                 let mut result:String = "".to_string();
                 for zero in zeros{
@@ -61,22 +79,28 @@ fn main() {
             }else{
                 print_output("this function is not defined");
             }
+            
+        //error
         }else if result == 100{
             print_output("command not found");
         }
-
     }
-
 }
 
-fn interpret_command(input:&str)->u8{//what the returns mean: 10 = print help, 20 = print function, 30 = store function, 40 = get value, 60 = derive, 70 = zeros
+
+//interprets the entered command
+//what the returns mean: 10 = print help, 20 = print function, 30 = store function, 40 = get value, 60 = derive, 70 = zeros
+fn interpret_command(input:&str)->u8{
+    //state variable for state machine
     let mut state:u8 = 0;
+    //check if it's one of the easyer to detect commands
     if (input.len() > 10) && (&input[0..6] == "derive"){
         state = 60;
     }else if (input.len() > 9) && (&input[0..5] == "zeros"){
         state = 70;
     }else if &input[0..input.len()] == "help"{
         state = 10;
+    //state machine to detect more complex commands
     }else{
         for c in input.chars(){
             match state{
@@ -147,6 +171,7 @@ fn interpret_command(input:&str)->u8{//what the returns mean: 10 = print help, 2
     }
     state
 }
+
 
 //function to define all outputs, is a sepeate function to be able to swiftly change
 //the style of the output without having to change every single println!

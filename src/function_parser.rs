@@ -2,6 +2,7 @@
 //the resulting Vec consist of a tuple for each term, the tuple consists of the multiplicant a and the power n (ax^n)
 //the parser is basically a deterministic finite state machine, draw it up in a diagramm to understand it.
 pub fn parse_function(input:&str) -> (Vec<(bool, f64, usize)>, bool){
+
     let mut state:u8 = 0;
     let function:&str = &input[7..input.len()];
     let mut polynomal_representation:Vec<(bool, f64, usize)> = Vec::new();
@@ -87,6 +88,8 @@ pub fn parse_function(input:&str) -> (Vec<(bool, f64, usize)>, bool){
     }
 }
 
+
+//converts the a function to a string
 pub fn func_to_string(func:&Vec<(bool, f64, usize)>)->String{
     let mut func_string:String = String::new();
     for i in 0 .. (func.len()) {
@@ -109,7 +112,6 @@ pub fn func_to_string(func:&Vec<(bool, f64, usize)>)->String{
 }
 
 
-
 //this function converts number like ¹²³³⁴⁵ to normal u32
 fn superscript_to_usize(char:&char)->usize{
     match *char as u16{
@@ -127,6 +129,8 @@ fn superscript_to_usize(char:&char)->usize{
     }
 }
 
+
+//converts an integer to a String in "superscript" representation (for eg. x²)
 fn usize_to_superscript(num:usize)->String{
     let nums:String = num.to_string();
     let mut result:String = String::new();
@@ -148,6 +152,8 @@ fn usize_to_superscript(num:usize)->String{
     result
 }
 
+
+//merge sort algorithm to sort monomials from highest to lowest by degree
 fn sort(func:Vec<(bool, f64, usize)>)->Vec<(bool, f64, usize)>{
     let mut sorter:Vec<Vec<(bool, f64, usize)>> = Vec::new();
     sorter.push(func.clone());
@@ -191,6 +197,8 @@ fn sort(func:Vec<(bool, f64, usize)>)->Vec<(bool, f64, usize)>{
     merge(result)
 }
 
+
+//merge together monomials like eg. 5x² + 5x² = 10x². Called at the end of merge
 fn merge(func:Vec<(bool, f64, usize)>)->Vec<(bool, f64, usize)>{
     let mut merged:Vec<(bool, f64, usize)> = Vec::new();
     for (sign, a, n) in func{
@@ -227,6 +235,8 @@ fn merge(func:Vec<(bool, f64, usize)>)->Vec<(bool, f64, usize)>{
     merged
 }
 
+
+//state machine to transform a String to a f64 if possible
 pub fn get_f64_from_string(input:&str)->f64{
     let mut x:f64 = 0.0;
     let mut state:u8 = 0;
