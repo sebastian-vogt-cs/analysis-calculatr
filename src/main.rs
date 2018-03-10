@@ -69,7 +69,7 @@ fn main() {
         }else if result == 70{
             //search for function in memory
             if let Some(value) = functions.get(&input[6..input.len()-3]) {
-                let zeros:Vec<f64> = fmath::get_zeros(value, 0);
+                let zeros:Vec<f64> = fmath::get_zeros(value);
                 let mut result:String = "".to_string();
                 for zero in zeros{
                     result.push_str(&zero.to_string());
