@@ -1,5 +1,9 @@
-use std::io;
-use std::io::Write;
+extern crate termion;
+use termion::{color, style};
+use termion::event::Key;
+use termion::input::TermRead;
+use termion::raw::IntoRawMode;
+use std::io::{Write, stdout, stdin};
 use std::collections::HashMap;
 mod function_parser;
 mod fmath;
@@ -8,7 +12,7 @@ mod fmath;
 fn main() {
     
     println!("Welcome to the analysis-calculatr, type help for help");
-
+    
     //here all the functions the user enter are stored in
     let mut functions = HashMap::new();
 
@@ -16,11 +20,14 @@ fn main() {
     loop{
 
         //take user input
-        print!("> ");
-        io::stdout().flush().ok().expect("error");
-        let mut input = String::new();
-        io::stdin().read_line(&mut input).ok().expect("error");
-        input.pop();
+        //io::stdout().flush().ok().expect("error");
+        //io::stdin().read_line(&mut input).ok().expect("error");
+        //input.pop();
+
+        let (input, should_break) = get_input();
+        if should_break{
+            break
+        }
 
         //send input to the command parser
         let result:u8 = interpret_command(&input);
@@ -176,5 +183,75 @@ fn interpret_command(input:&str)->u8{
 //function to define all outputs, is a sepeate function to be able to swiftly change
 //the style of the output without having to change every single println!
 fn print_output(output:&str){
-    println!("\n>> {}\n", output);
+    println!("\n{}{}>> {}{}{}\n", color::Fg(color::Blue), style::Bold, output, color::Fg(color::Reset), style::Reset);
+}
+
+fn get_input()->(String, bool){
+    let mut break_afterwards:bool = false;
+    let mut input = String::new();
+     // Get the standard input stream.
+    let stdin = stdin();
+    // Get the standard output stream and go to raw mode.
+    let mut stdout = stdout().into_raw_mode().unwrap();
+
+    // Flush stdout (i.e. make the output appear).
+    //stdout.flush().unwrap();
+
+    //Clear the current line.
+    write!(stdout, "{}> ", termion::clear::CurrentLine).unwrap();
+    let mut cursor_pos:u16 = 3;
+
+    for c in stdin.keys() {
+
+        // Print the key we type...
+        match c.unwrap() {
+            // Exit.
+            Key::Char('q') => {break_afterwards = true; break},
+            Key::Char(c)   => {
+                print!("{}", c);
+                input.push(c);
+                cursor_pos = cursor_pos + 1;
+                },
+            Key::Alt(c)    => print!("Alt-{}", c),
+            Key::Ctrl(c)   => print!("Ctrl-{}", c),
+            Key::Left      => {
+                if cursor_pos > 3{
+                    print!("{}", termion::cursor::Left(1));
+                    cursor_pos = cursor_pos - 1;
+                }
+            },
+            Key::Right     => {
+                if cursor_pos < input.len() as u16 + 3 as u16{
+                    print!("{}", termion::cursor::Right(1));
+                    cursor_pos = cursor_pos + 1;
+                }
+            },
+            Key::Backspace => {
+                if cursor_pos > 3{
+                    input.remove(cursor_pos as usize - 4);
+                    let old_pos = cursor_pos;
+                    while cursor_pos > 0{
+                        write!(stdout, "{}", termion::cursor::Left(1)).unwrap();
+                        cursor_pos = cursor_pos - 1;
+                    }
+                    write!(stdout, "{}> {}", termion::clear::CurrentLine, input).unwrap();
+                    cursor_pos = 2 + input.len() as u16;
+                    while cursor_pos > 0{
+                        write!(stdout, "{}", termion::cursor::Left(1)).unwrap();
+                        cursor_pos = cursor_pos - 1;
+                    }
+                    for _i in 0..old_pos - 2{
+                        write!(stdout, "{}", termion::cursor::Right(1)).unwrap();
+                    }
+                    cursor_pos = old_pos - 1;
+                }
+            },
+            Key::Down      => break,
+            _              => print!("Other"),
+        }
+
+        // Flush again.
+        stdout.flush().unwrap();
+    }
+    (input, break_afterwards)
 }
