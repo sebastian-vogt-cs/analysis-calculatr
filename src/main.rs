@@ -16,6 +16,11 @@ fn main() {
     //here all the functions the user enter are stored in
     let mut functions = HashMap::new();
 
+    let mut stdout = stdout().into_raw_mode().unwrap();
+    stdout.flush().unwrap();
+    write!(stdout, "{}", termion::clear::All).unwrap();
+    stdout.flush().unwrap();
+
     //this infinite loop provides the command-line interface of the application
     loop{
 
@@ -42,6 +47,11 @@ fn main() {
             if response.1{
                 functions.insert(input[0..1].to_string(), response.0);
                 print_output("this function was saved to memory");
+                write!(stdout, "{}{}", termion::cursor::Goto(1, 1), termion::clear::All).unwrap();
+                for (name, func) in &functions{
+                    write!(stdout, "{}(x) = {}, ", name, function_parser::func_to_string(func)).unwrap();
+                }
+                write!(stdout, "{}", termion::cursor::Hide).unwrap();
             }else{
                 print_output("this function is not in supported notation");
             }
@@ -183,7 +193,11 @@ fn interpret_command(input:&str)->u8{
 //function to define all outputs, is a sepeate function to be able to swiftly change
 //the style of the output without having to change every single println!
 fn print_output(output:&str){
-    println!("\n{}{}>> {}{}{}\n", color::Fg(color::Blue), style::Bold, output, color::Fg(color::Reset), style::Reset);
+    let mut stdout = stdout().into_raw_mode().unwrap();
+    stdout.flush().unwrap();
+    write!(stdout, "{}", termion::cursor::Hide).unwrap();
+    write!(stdout, "{}{}{}{}>> {}{}{}", termion::cursor::Goto(1, 30), termion::clear::CurrentLine,  color::Fg(color::Blue), style::Bold, output, color::Fg(color::Reset), style::Reset).unwrap();
+    stdout.flush().unwrap();
 }
 
 fn get_input()->(String, bool){
@@ -195,10 +209,11 @@ fn get_input()->(String, bool){
     let mut stdout = stdout().into_raw_mode().unwrap();
 
     // Flush stdout (i.e. make the output appear).
-    //stdout.flush().unwrap();
+    stdout.flush().unwrap();
 
     //Clear the current line.
-    write!(stdout, "{}> ", termion::clear::CurrentLine).unwrap();
+    write!(stdout, "{}{}> ", termion::cursor::Goto(1, 30), termion::clear::CurrentLine).unwrap();
+    write!(stdout, "{}", termion::cursor::Show).unwrap();
     let mut cursor_pos:u16 = 3;
 
     for c in stdin.keys() {
