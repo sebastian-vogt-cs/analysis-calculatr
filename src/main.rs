@@ -224,9 +224,23 @@ fn get_input()->(String, bool){
             Key::Char('q') => {break_afterwards = true; break},
             Key::Char(c)   => {
                 print!("{}", c);
-                input.push(c);
+                match c{
+                    '¹' => input.insert(cursor_pos as usize - 3, '1'),
+                    '²' => input.insert(cursor_pos as usize - 3, '2'),
+                    '³' => input.insert(cursor_pos as usize - 3, '3'),
+                    '⁴' => input.insert(cursor_pos as usize - 3, '4'),
+                    '⁵' => input.insert(cursor_pos as usize - 3, '5'),
+                    '⁶' => input.insert(cursor_pos as usize - 3, '6'),
+                    '⁷' => input.insert(cursor_pos as usize - 3, '7'),
+                    '⁸' => input.insert(cursor_pos as usize - 3, '8'),
+                    '⁹' => input.insert(cursor_pos as usize - 3, '9'),
+                    '⁰' => input.insert(cursor_pos as usize - 3, '0'),
+                    _ => input.insert(cursor_pos as usize - 3, c),
+                }
+                write!(stdout, "{}{}> {}", termion::cursor::Goto(1, 30), termion::clear::CurrentLine, string_with_superscript(&input)).unwrap();
                 cursor_pos = cursor_pos + 1;
-                },
+                write!(stdout, "{}", termion::cursor::Goto(cursor_pos, 30)).unwrap();
+            },
             Key::Alt(c)    => print!("Alt-{}", c),
             Key::Ctrl(c)   => print!("Ctrl-{}", c),
             Key::Left      => {
@@ -236,7 +250,7 @@ fn get_input()->(String, bool){
                 }
             },
             Key::Right     => {
-                if cursor_pos < input.len() as u16 + 3 as u16{
+                if cursor_pos < input.len() as u16 + 3{
                     print!("{}", termion::cursor::Right(1));
                     cursor_pos = cursor_pos + 1;
                 }
@@ -249,15 +263,9 @@ fn get_input()->(String, bool){
                         write!(stdout, "{}", termion::cursor::Left(1)).unwrap();
                         cursor_pos = cursor_pos - 1;
                     }
-                    write!(stdout, "{}> {}", termion::clear::CurrentLine, input).unwrap();
-                    cursor_pos = 2 + input.len() as u16;
-                    while cursor_pos > 0{
-                        write!(stdout, "{}", termion::cursor::Left(1)).unwrap();
-                        cursor_pos = cursor_pos - 1;
-                    }
-                    for _i in 0..old_pos - 2{
-                        write!(stdout, "{}", termion::cursor::Right(1)).unwrap();
-                    }
+                    write!(stdout, "{}> {}", termion::clear::CurrentLine, string_with_superscript(&input)).unwrap();
+                    write!(stdout, "{}", termion::cursor::Goto(1, 30)).unwrap();
+                    write!(stdout, "{}", termion::cursor::Goto(old_pos - 1, 30)).unwrap();
                     cursor_pos = old_pos - 1;
                 }
             },
@@ -268,5 +276,89 @@ fn get_input()->(String, bool){
         // Flush again.
         stdout.flush().unwrap();
     }
-    (input, break_afterwards)
+    (string_with_superscript(&input), break_afterwards)
+}
+
+fn string_with_superscript(input:&String)->String{
+    let mut last_char = '.';
+    let mut output:String = String::new();
+    for c in input.as_str().chars(){
+        match c{
+            '1' => {
+                match last_char{
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('¹'),
+                    _ => output.push('1'),
+                }
+                last_char = c;
+            },
+            '2' => {
+                match last_char{
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('²'),
+                    _ => output.push('2'),
+                }
+                last_char = c;
+            },
+            '3' => {
+                match last_char{
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('³'),
+                    _ => output.push('3'),
+                }
+                last_char = c;
+            },
+            '4' => {
+                match last_char{
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁴'),
+                    _ => output.push('4'),
+                }
+                last_char = c;
+            },
+            '5' => {
+                match last_char{
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁵'),
+                    _ => output.push('5'),
+                }
+                last_char = c;
+            },
+            '6' => {
+                match last_char{
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁶'),
+                    _ => output.push('6'),
+                }
+                last_char = c;
+            },
+            '7' => {
+                match last_char{
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁷'),
+                    _ => output.push('7'),
+                }
+                last_char = c;
+            },
+            '8' => {
+                match last_char{
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁸'),
+                    _ => output.push('8'),
+                }
+                last_char = c;
+            },
+            '9' => {
+                match last_char{
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁹'),
+                    _ => output.push('9'),
+                }
+                last_char = c;
+            },
+            '0' => {
+                match last_char{
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁰'),
+                    _ => output.push('0'),
+                }
+                last_char = c;
+            },
+            _ => {
+                output.push(c);
+                last_char = c;
+            },
+        }
+    }
+    output
 }

@@ -113,7 +113,7 @@ pub fn func_to_string(func:&Vec<(bool, f64, usize)>)->String{
 
 
 //this function converts number like ¹²³³⁴⁵ to normal u32
-fn superscript_to_usize(char:&char)->usize{
+pub fn superscript_to_usize(char:&char)->usize{
     match *char as u16{
         185  => 1,
         178  => 2,
