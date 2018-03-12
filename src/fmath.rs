@@ -81,11 +81,25 @@ pub fn get_zeros(func:&Vec<(bool, f64, usize)>)->Vec<f64>{
 fn newton_alg(x_start:f64, func:&Vec<(bool, f64, usize)>)->f64{
     let mut x:f64 = x_start;
     let derivative:Vec<(bool, f64, usize)> = derive(func);
+    let mut i = 0;
+    let mut x_max = 0.0;
+    let mut x_min = 0.0;
     loop{
         if get_y_for(round(x), func) == 0.0{
             break
         }
         x = x - (get_y_for(x, func)/get_y_for(x, &derivative));
+        i += 1;
+        if i == 1000{
+            if x > x_max{
+                x_max = x;
+            }else if x < x_min{
+                x_min = x;
+            }
+        }else if i == 1100{
+            x = (x_max + x_min)/2.0;
+            return x
+        }
     }
     x
 }
