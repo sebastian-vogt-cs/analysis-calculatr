@@ -82,7 +82,7 @@ fn newton_alg(x_start:f64, func:&Vec<(bool, f64, usize)>)->f64{
     let mut x:f64 = x_start;
     let derivative:Vec<(bool, f64, usize)> = derive(func);
     loop{
-        if round(get_y_for(round(x), func)) == 0.0{
+        if get_y_for(round(x), func) == 0.0{
             break
         }
         x = x - (get_y_for(x, func)/get_y_for(x, &derivative));
