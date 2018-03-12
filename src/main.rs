@@ -223,7 +223,7 @@ fn get_input()->(String, bool){
             // Exit.
             Key::Char('q') => {break_afterwards = true; break},
             Key::Char(c)   => {
-                print!("{}", c);
+                let mut written:bool = true;
                 match c{
                     '¹' => input.insert(cursor_pos as usize - 3, '1'),
                     '²' => input.insert(cursor_pos as usize - 3, '2'),
@@ -235,11 +235,20 @@ fn get_input()->(String, bool){
                     '⁸' => input.insert(cursor_pos as usize - 3, '8'),
                     '⁹' => input.insert(cursor_pos as usize - 3, '9'),
                     '⁰' => input.insert(cursor_pos as usize - 3, '0'),
-                    _ => input.insert(cursor_pos as usize - 3, c),
+                    _ => {
+                        if c.len_utf8() < 2{
+                            input.insert(cursor_pos as usize - 3, c);
+                        }else{
+                            written = false;
+                        }
+                    },
                 }
-                write!(stdout, "{}{}> {}", termion::cursor::Goto(1, 30), termion::clear::CurrentLine, string_with_superscript(&input)).unwrap();
-                cursor_pos = cursor_pos + 1;
-                write!(stdout, "{}", termion::cursor::Goto(cursor_pos, 30)).unwrap();
+                if written{
+                    print!("{}", c);
+                    write!(stdout, "{}{}> {}", termion::cursor::Goto(1, 30), termion::clear::CurrentLine, string_with_superscript(&input)).unwrap();
+                    cursor_pos = cursor_pos + 1;
+                    write!(stdout, "{}", termion::cursor::Goto(cursor_pos, 30)).unwrap();
+                }
             },
             Key::Alt(c)    => print!("Alt-{}", c),
             Key::Ctrl(c)   => print!("Ctrl-{}", c),
