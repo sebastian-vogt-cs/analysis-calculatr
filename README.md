@@ -1,5 +1,5 @@
 # analysis-calculatr
-Provides many useful tools for mathamtical functions
+Provides many useful tools for mathematical functions
 
 ## what this application is supposed to do in the future:
 calculate zeros, calculate extrema, derive, integrate, ... in a command line interface
