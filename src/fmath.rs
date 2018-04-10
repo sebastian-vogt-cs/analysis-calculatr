@@ -2,11 +2,11 @@ static ACCURACY:f64 = 100000.0;
 
 
 //derive a function
-pub fn derive(func:&Vec<(bool, f64, usize)>)->Vec<(bool, f64, usize)>{
+pub fn derive(func:&Vec<(bool, f64, isize)>)->Vec<(bool, f64, isize)>{
 
     //variables for the new function and the memory that safes the latest monomial when iterating through the monomials
-    let mut new_func:Vec<(bool, f64, usize)> = Vec::new();
-    let mut memory:(bool, f64, usize) = (true, 0.0, 0);
+    let mut new_func:Vec<(bool, f64, isize)> = Vec::new();
+    let mut memory:(bool, f64, isize) = (true, 0.0, 0);
 
     //iterate through the monomials and derive them seperatly
     for &(sign, a, n) in func{
@@ -15,6 +15,11 @@ pub fn derive(func:&Vec<(bool, f64, usize)>)->Vec<(bool, f64, usize)>{
             memory.1 = a * (n as f64);
             memory.0 = sign;
             new_func.push(memory);
+        }else if n < 0{
+            memory.2 = n - 1;
+            memory.1 = - a * (n as f64);
+            memory.0 = !sign;
+            new_func.push(memory);
         }
     }
     new_func
@@ -22,7 +27,7 @@ pub fn derive(func:&Vec<(bool, f64, usize)>)->Vec<(bool, f64, usize)>{
 
 
 //get y value for a specified x value for a specified function
-pub fn get_y_for(x:f64, func:&Vec<(bool, f64, usize)>)->f64{
+pub fn get_y_for(x:f64, func:&Vec<(bool, f64, isize)>)->f64{
     let mut result:f64 = 0.0;
     for &(sign, a, n) in func{
         result = if sign {
@@ -36,7 +41,7 @@ pub fn get_y_for(x:f64, func:&Vec<(bool, f64, usize)>)->f64{
 
 
 //calculate zeros of a function via newton algorithm
-pub fn get_zeros(func:&Vec<(bool, f64, usize)>)->Vec<f64>{
+pub fn get_zeros(func:&Vec<(bool, f64, isize)>)->Vec<f64>{
 
     //this variable stores the zeros
     let mut values:Vec<f64> = Vec::new();
@@ -78,9 +83,9 @@ pub fn get_zeros(func:&Vec<(bool, f64, usize)>)->Vec<f64>{
 
 
 //implementation of the newton algorithm for calculating zeros. Google if you want to know how the maths work
-fn newton_alg(x_start:f64, func:&Vec<(bool, f64, usize)>)->f64{
+fn newton_alg(x_start:f64, func:&Vec<(bool, f64, isize)>)->f64{
     let mut x:f64 = x_start;
-    let derivative:Vec<(bool, f64, usize)> = derive(func);
+    let derivative:Vec<(bool, f64, isize)> = derive(func);
     let mut i = 0;
     let mut x_max = 0.0;
     let mut x_min = 0.0;

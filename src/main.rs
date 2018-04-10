@@ -43,7 +43,7 @@ fn main() {
 
         //store function
         }else if result == 30{
-            let response:(Vec<(bool, f64, usize)>, bool) = function_parser::parse_function(&input);
+            let response:(Vec<(bool, f64, isize)>, bool) = function_parser::parse_function(&input);
             if response.1{
                 functions.insert(input[0..1].to_string(), response.0);
                 print_output("this function was saved to memory");
@@ -302,61 +302,67 @@ fn string_with_superscript(input:&String)->String{
         match c{
             '1' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('¹'); last_char = '¹'},
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X'|'⁻' => {output.push('¹'); last_char = '¹'},
                     _ => {output.push(c); last_char = c},
                 }
             },
             '2' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('²'); last_char = '²'},
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X'|'⁻' => {output.push('²'); last_char = '²'},
                     _ => {output.push(c); last_char = c},
                 }
             },
             '3' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('³'); last_char = '³'},
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X'|'⁻' => {output.push('³'); last_char = '³'},
                     _ => {output.push(c); last_char = c},
                 }
             },
             '4' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁴'); last_char = '⁴'},
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X'|'⁻' => {output.push('⁴'); last_char = '⁴'},
                     _ => {output.push(c); last_char = c},
                 }
             },
             '5' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁵'); last_char = '⁵'},
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X'|'⁻' => {output.push('⁵'); last_char = '⁵'},
                     _ => {output.push(c); last_char = c},
                 }
             },
             '6' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁶'); last_char = '⁶'},
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X'|'⁻' => {output.push('⁶'); last_char = '⁶'},
                     _ => {output.push(c); last_char = c},
                 }
             },
             '7' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁷'); last_char = '⁷'},
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X'|'⁻' => {output.push('⁷'); last_char = '⁷'},
                     _ => {output.push(c); last_char = c},
                 }
             },
             '8' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁸'); last_char = '⁸'},
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X'|'⁻' => {output.push('⁸'); last_char = '⁸'},
                     _ => {output.push(c); last_char = c},
                 }
             },
             '9' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁹'); last_char = '⁹'},
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X'|'⁻' => {output.push('⁹'); last_char = '⁹'},
                     _ => {output.push(c); last_char = c},
                 }
             },
             '0' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁰'); last_char = '⁰'},
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X'|'⁻' => {output.push('⁰'); last_char = '⁰'},
+                    _ => {output.push(c); last_char = c},
+                }
+            },
+            '-' => {
+                match last_char{
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X'|'⁻' => {output.push('⁻'); last_char = '⁻'},
                     _ => {output.push(c); last_char = c},
                 }
             },
