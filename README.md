@@ -11,4 +11,4 @@ calculate zeros, calculate extrema, derive, integrate, ... in a command line int
   - print derivative: "derive f(x)", or Ctrl + "f"
   - print zeros (experimental): "zeros f(x)", or Alt + "f"
   
-for go implementation see [this repo](github.com/TomBom4/go-analysis-calculatr).  
+for go implementation see [this repo](github.com/TomBom4/go-analysiscalc).  
