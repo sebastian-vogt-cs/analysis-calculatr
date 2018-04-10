@@ -39,7 +39,7 @@ fn main() {
 
         //execute the command: print help
         if result == 10{
-            print_output("define a function like that: f(x) = x, only one-character function names are allowed");
+            print_output("define a function like that: f(x) = x, only one-character function names are allowed.Submit your input with \"arrow key down\", \"enter\" is broke at the moment. To get the derivative of f type \"derive f(x)\" or push \"Ctr + f\". To get the zeros of f type \"zeros f(x)\" or push \" Alt + f\"");
 
         //store function
         }else if result == 30{
@@ -49,7 +49,7 @@ fn main() {
                 print_output("this function was saved to memory");
                 write!(stdout, "{}{}", termion::cursor::Goto(1, 1), termion::clear::All).unwrap();
                 for (name, func) in &functions{
-                    write!(stdout, "{}(x) = {}, ", name, function_parser::func_to_string(func)).unwrap();
+                    write!(stdout, "{}(x) = {} ", name, function_parser::func_to_string(func)).unwrap();
                 }
                 write!(stdout, "{}", termion::cursor::Hide).unwrap();
             }else{
@@ -218,10 +218,8 @@ fn get_input()->(String, bool){
 
     for c in stdin.keys() {
 
-        // Print the key we type...
         match c.unwrap() {
-            // Exit.
-            Key::Char('q') => {break_afterwards = true; break},
+            Key::Char('\n') => break,
             Key::Char(c)   => {
                 let mut written:bool = true;
                 match c{
@@ -250,8 +248,8 @@ fn get_input()->(String, bool){
                     write!(stdout, "{}", termion::cursor::Goto(cursor_pos, 30)).unwrap();
                 }
             },
-            Key::Alt(c)    => print!("Alt-{}", c),
-            Key::Ctrl(c)   => print!("Ctrl-{}", c),
+            Key::Ctrl('c')   => {break_afterwards = true; break},
+            Key::Esc => {break_afterwards = true; break},
             Key::Left      => {
                 if cursor_pos > 3{
                     print!("{}", termion::cursor::Left(1));
@@ -278,6 +276,15 @@ fn get_input()->(String, bool){
                     cursor_pos = old_pos - 1;
                 }
             },
+            Key::Ctrl(c) => {
+                input = format!("derive {}(x)", c);
+                break;
+            },
+            Key::Alt(c) => {
+                input = format!("zeros {}(x)", c);
+                break;
+            },
+            Key::Null => break,
             Key::Down      => break,
             _              => print!("Other"),
         }
@@ -295,73 +302,63 @@ fn string_with_superscript(input:&String)->String{
         match c{
             '1' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('¹'),
-                    _ => output.push('1'),
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('¹'); last_char = '¹'},
+                    _ => {output.push(c); last_char = c},
                 }
-                last_char = c;
             },
             '2' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('²'),
-                    _ => output.push('2'),
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('²'); last_char = '²'},
+                    _ => {output.push(c); last_char = c},
                 }
-                last_char = c;
             },
             '3' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('³'),
-                    _ => output.push('3'),
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('³'); last_char = '³'},
+                    _ => {output.push(c); last_char = c},
                 }
-                last_char = c;
             },
             '4' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁴'),
-                    _ => output.push('4'),
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁴'); last_char = '⁴'},
+                    _ => {output.push(c); last_char = c},
                 }
-                last_char = c;
             },
             '5' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁵'),
-                    _ => output.push('5'),
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁵'); last_char = '⁵'},
+                    _ => {output.push(c); last_char = c},
                 }
-                last_char = c;
             },
             '6' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁶'),
-                    _ => output.push('6'),
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁶'); last_char = '⁶'},
+                    _ => {output.push(c); last_char = c},
                 }
-                last_char = c;
             },
             '7' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁷'),
-                    _ => output.push('7'),
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁷'); last_char = '⁷'},
+                    _ => {output.push(c); last_char = c},
                 }
-                last_char = c;
             },
             '8' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁸'),
-                    _ => output.push('8'),
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁸'); last_char = '⁸'},
+                    _ => {output.push(c); last_char = c},
                 }
-                last_char = c;
             },
             '9' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁹'),
-                    _ => output.push('9'),
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁹'); last_char = '⁹'},
+                    _ => {output.push(c); last_char = c},
                 }
-                last_char = c;
             },
             '0' => {
                 match last_char{
-                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => output.push('⁰'),
-                    _ => output.push('0'),
+                    'x'|'¹'|'²'|'³'|'⁴'|'⁵'|'⁶'|'⁷'|'⁸'|'⁹'|'⁰'|'X' => {output.push('⁰'); last_char = '⁰'},
+                    _ => {output.push(c); last_char = c},
                 }
-                last_char = c;
             },
             _ => {
                 output.push(c);
