@@ -8,7 +8,7 @@ calculate zeros, calculate extrema, derive, integrate, ... in a command line int
   - define function: "f(x) = 4x² + 3x - 5"
   - print function: "f(x)"
   - print y-value: "f(3)"
-  - print derivative: "derive f(x)"
-  - print zeros (experimental): "zeros f(x)"
+  - print derivative: "derive f(x)", or Ctrl + "f"
+  - print zeros (experimental): "zeros f(x)", or Alt + "f"
   
 for go implementation see github.com/TomBom4/go-analysis-calculatr  
