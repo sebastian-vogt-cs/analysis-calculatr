@@ -29,7 +29,7 @@ pub fn parse_function(input:&str) -> (Vec<(bool, f64, usize)>, bool){
             2 =>{
                 match c {
                     ' ' => {state = 5; memory = (memory.0, memory.1, 1); polynomal_representation.push(memory)},
-                    '¹' | '²' | '³' | '⁴' | '⁵' | '⁶' | '⁷' | '⁸' | '⁹' => {state = 4; memory = (memory.0, memory.1, superscript_to_usize(&c))},
+                    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {state = 4; memory = (memory.0, memory.1, c.to_digit(10).unwrap() as usize)},
                     _ => {state = 8; break;},
                 }
             }
@@ -46,8 +46,8 @@ pub fn parse_function(input:&str) -> (Vec<(bool, f64, usize)>, bool){
             }
             4 =>{
                 match c {
-                    '¹' | '²' | '³' | '⁴' | '⁵' | '⁶' | '⁷' | '⁸' | '⁹' | '⁰' => {state = 4; 
-                        memory = (memory.0, memory.1, memory.2*10 + superscript_to_usize(&c));
+                    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => {state = 4; 
+                        memory = (memory.0, memory.1, memory.2*10 + c.to_digit(10).unwrap() as usize);
                     },
                     ' ' => {state = 5; memory = (memory.0, memory.1, memory.2); polynomal_representation.push(memory)},
                     _ => {state = 8; break;},
@@ -109,24 +109,6 @@ pub fn func_to_string(func:&Vec<(bool, f64, usize)>)->String{
         }
     }
     func_string
-}
-
-
-//this function converts number like ¹²³³⁴⁵ to normal u32
-pub fn superscript_to_usize(char:&char)->usize{
-    match *char as u16{
-        185  => 1,
-        178  => 2,
-        179  => 3,
-        8308 => 4,
-        8309 => 5,
-        8310 => 6,
-        8311 => 7,
-        8312 => 8,
-        8313 => 9,
-        8304 => 0,
-        _    => 1000, //high number to indicate to myself somthing hase gone wrong
-    }
 }
 
 

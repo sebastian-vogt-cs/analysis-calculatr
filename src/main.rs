@@ -292,7 +292,7 @@ fn get_input()->(String, bool){
         // Flush again.
         stdout.flush().unwrap();
     }
-    (string_with_superscript(&input), break_afterwards)
+    (input, break_afterwards)
 }
 
 fn string_with_superscript(input:&String)->String{
