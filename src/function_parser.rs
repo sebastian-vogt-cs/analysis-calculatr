@@ -1,45 +1,52 @@
 //this func checks weather or not the function is a correctly entered polynomal function and maps the function in a usable way into a Vec
 //the resulting Vec consist of a tuple for each term, the tuple consists of the multiplicant a and the power n (ax^n)
 //the parser is basically a deterministic finite state machine, draw it up in a diagramm to understand it.
-pub fn parse_function(input:&str) -> (Vec<(bool, f64, isize)>, bool){
+pub fn parse_function(input:&str) -> (Vec<(f64, isize)>, bool){
 
     let mut state:u8 = 0;
     let function:&str = &input[7..input.len()];
-    let mut polynomal_representation:Vec<(bool, f64, isize)> = Vec::new();
-    let mut memory:(bool, f64, isize) = (true, 0.0, 0);
+    let mut polynomal_representation:Vec<(f64, isize)> = Vec::new();
+    let mut memory:(f64, isize) = (0.0, 0);
     let mut dezplace:usize = 10;
+    let mut is_sign_negative = false;
 
     for c in function.chars() {
         match state {
             0 =>{
                 match c {
-                    '-' => {state = 6; memory = (false, 1.0, 0)},
-                    'x' => {state = 2; memory = (memory.0, 1.0, 1)},
-                    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => {state = 3; memory = (memory.0, c.to_digit(10).unwrap() as f64, 0); dezplace = 10},
+                    '-' => {state = 6; memory = (1.0, 0); is_sign_negative = true;},
+                    'x' => {state = 2; memory = (1.0, 1)},
+                    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => {state = 3; memory = (c.to_digit(10).unwrap() as f64, 0); dezplace = 10},
                     _ => {state = 8; break;},
                 }
             }
             1 =>{
                 match c {
-                    'x' => {state = 2; memory = (memory.0, 1.0, 1)},
-                    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {state = 3; memory = (memory.0, c.to_digit(10).unwrap() as f64, 0)},
+                    'x' => {state = 2; memory = (1.0, 1)},
+                    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {state = 3; memory = (c.to_digit(10).unwrap() as f64, 0)},
                     _ => {state = 8; break;},
                 }
             }
             2 =>{
                 match c {
-                    ' ' => {state = 5; memory = (memory.0, memory.1, 1); polynomal_representation.push(memory)},
-                    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {state = 4; memory = (memory.0, memory.1, memory.2 * c.to_digit(10).unwrap() as isize)},
-                    '-' => memory = (memory.0, memory.1, -1),
+                    ' ' => {state = 5; memory = (memory.0, 1); polynomal_representation.push(memory)},
+                    '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {state = 4; memory = (memory.0, memory.1 * c.to_digit(10).unwrap() as isize)},
+                    '-' => memory = (memory.0, -1),
                     _ => {state = 8; break;},
                 }
             }
             3 =>{
                 match c {
-                    ' ' => {state = 5; memory = (memory.0, memory.1, 0); polynomal_representation.push(memory)},
-                    'x' => {state = 2; memory = (memory.0, memory.1, 1);}
+                    ' ' => {
+                        state = 5; memory = (memory.0, 0);
+                        if is_sign_negative {
+                            memory.0 = - memory.0
+                        }
+                        polynomal_representation.push(memory)
+                    },
+                    'x' => {state = 2; memory = (memory.0, 1);}
                     '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => {state = 3; 
-                        memory = (memory.0, memory.1*10.0 + c.to_digit(10).unwrap() as f64, 0);
+                        memory = (memory.0*10.0 + c.to_digit(10).unwrap() as f64, 0);
                     },
                     '.' => state = 7,
                     _ => {state = 8; break;},
@@ -48,16 +55,22 @@ pub fn parse_function(input:&str) -> (Vec<(bool, f64, isize)>, bool){
             4 =>{
                 match c {
                     '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => {state = 4; 
-                        memory = (memory.0, memory.1, memory.2*10 + c.to_digit(10).unwrap() as isize);
+                        memory = (memory.0, memory.1*10 + c.to_digit(10).unwrap() as isize);
                     },
-                    ' ' => {state = 5; memory = (memory.0, memory.1, memory.2); polynomal_representation.push(memory)},
+                    ' ' => {
+                        state = 5; memory = (memory.0, memory.1);
+                        if is_sign_negative {
+                            memory.0 = - memory.0;
+                        }
+                        polynomal_representation.push(memory)
+                        },
                     _ => {state = 8; break;},
                 }
             }
             5 =>{
                 match c {
-                    '+' => {state = 6; memory = (true, 0.0, 0)},
-                    '-' => {state = 6; memory = (false, 0.0, 0)},
+                    '+' => {state = 6; memory = (0.0, 0); is_sign_negative = false;},
+                    '-' => {state = 6; memory = (0.0, 0); is_sign_negative = true;},
                     _ => {state = 8; break;},
                 }
             }
@@ -69,17 +82,26 @@ pub fn parse_function(input:&str) -> (Vec<(bool, f64, isize)>, bool){
             }
             7 =>{
                 match c{
-                    ' ' => {state = 5; memory = (memory.0, memory.1, 0); polynomal_representation.push(memory)},
-                    'x' => {state = 2; memory = (memory.0, memory.1, 1);}
+                    ' ' => {
+                        state = 5; memory = (memory.0, 0);
+                        if is_sign_negative {
+                            memory.0 = - memory.0
+                        }
+                        polynomal_representation.push(memory)
+                    },
+                    'x' => {state = 2; memory = (memory.0, 1);}
                     '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' | '0' => {
                         state = 7; 
-                        memory = (memory.0, memory.1 + (c.to_digit(10).unwrap() as f64)/(dezplace as f64), 0); dezplace = dezplace * 10;
+                        memory = (memory.0 + (c.to_digit(10).unwrap() as f64)/(dezplace as f64), 0); dezplace = dezplace * 10;
                     },
                     _ => {state = 8; break;},
                 }
             }
             _ => {state = 8; break;},
         }
+    }
+    if is_sign_negative {
+     memory.0 = - memory.0;
     }
     polynomal_representation.push(memory);
     if (state == 2) | (state == 3) | (state == 4) | (state == 7) {
@@ -91,21 +113,26 @@ pub fn parse_function(input:&str) -> (Vec<(bool, f64, isize)>, bool){
 
 
 //converts the a function to a string
-pub fn func_to_string(func:&Vec<(bool, f64, isize)>)->String{
+pub fn func_to_string(func:&Vec<(f64, isize)>)->String{
     let mut func_string:String = String::new();
     for i in 0 .. (func.len()) {
-        if !func[i].0 {
+        if func[i].0 < 0.0 {
             func_string.push_str(" - ");
-        }else if i != 0{
+            if func[i].0 != - 1.0 {
+                func_string.push_str(&(- &func[i].0).to_string());
+            }   
+        }else if i != 0 {
             func_string.push_str(" + ");
+            if (func[i].0 != 1.0) || (func[i].1 == 0) {
+                func_string.push_str(&func[i].0.to_string());
+            }
+        } else if (func[i].0 != 1.0) || (func[i].1 == 0) {
+            func_string.push_str(&func[i].0.to_string());
         }
-        if !((func[i].1 == 1.0) && (func[i].2 != 0)){
-            func_string.push_str(&func[i].1.to_string());
-        }
-        if func[i].2 != 0{
+        if func[i].1 != 0{
             func_string.push('x');
-            if func[i].2 != 1{
-                func_string.push_str(&isize_to_superscript(func[i].2));
+            if func[i].1 != 1{
+                func_string.push_str(&isize_to_superscript(func[i].1));
             }
         }
     }
@@ -138,33 +165,33 @@ fn isize_to_superscript(num:isize)->String{
 
 
 //merge sort algorithm to sort monomials from highest to lowest by degree
-fn sort(func:Vec<(bool, f64, isize)>)->Vec<(bool, f64, isize)>{
-    let mut sorter:Vec<Vec<(bool, f64, isize)>> = Vec::new();
+fn sort(func:Vec<(f64, isize)>)->Vec<(f64, isize)>{
+    let mut sorter:Vec<Vec<(f64, isize)>> = Vec::new();
     sorter.push(func.clone());
     loop{
         if func.len() == sorter.len(){
             break;
         }
-        let mut new_sorter:Vec<Vec<(bool, f64, isize)>> = Vec::new();
+        let mut new_sorter:Vec<Vec<(f64, isize)>> = Vec::new();
         for vec in sorter{
             if vec.len() == 1{
                 new_sorter.push(vec);
                 continue;
             }
-            let middle = vec[vec.len()/2].2 as isize;
-            let mut vec1:Vec<(bool, f64, isize)> = Vec::new();
-            let mut vec2:Vec<(bool, f64, isize)> = Vec::new();
+            let middle = vec[vec.len()/2].1 as isize;
+            let mut vec1:Vec<(f64, isize)> = Vec::new();
+            let mut vec2:Vec<(f64, isize)> = Vec::new();
             let mut middle_counter = false;
-            for (sign, a, n) in vec{
+            for (a, n) in vec{
                 if n > middle{
-                    vec1.push((sign, a, n));
+                    vec1.push((a, n));
                 }else if n < middle{
-                    vec2.push((sign, a, n));
+                    vec2.push((a, n));
                 }else if (n == middle) && (vec1.len() == 0) && !middle_counter{
-                    vec1.push((sign, a, n));
+                    vec1.push((a, n));
                     middle_counter = true
                 }else{
-                    vec2.push((sign, a, n));
+                    vec2.push((a, n));
                 }
             }
             new_sorter.push(vec1);
@@ -172,10 +199,10 @@ fn sort(func:Vec<(bool, f64, isize)>)->Vec<(bool, f64, isize)>{
         }
         sorter = new_sorter;
     }
-    let mut result:Vec<(bool, f64, isize)> = Vec::new();
+    let mut result:Vec<(f64, isize)> = Vec::new();
     for vec in sorter{
-        for (sign, a, n) in vec{
-            result.push((sign, a, n));
+        for (a, n) in vec{
+            result.push((a, n));
         }
     }
     merge(result)
@@ -183,37 +210,18 @@ fn sort(func:Vec<(bool, f64, isize)>)->Vec<(bool, f64, isize)>{
 
 
 //merge together monomials like eg. 5x² + 5x² = 10x². Called at the end of merge
-fn merge(func:Vec<(bool, f64, isize)>)->Vec<(bool, f64, isize)>{
-    let mut merged:Vec<(bool, f64, isize)> = Vec::new();
-    for (sign, a, n) in func{
+fn merge(func:Vec<(f64, isize)>)->Vec<(f64, isize)>{
+    let mut merged:Vec<(f64, isize)> = Vec::new();
+    for (a, n) in func{
         if merged.len() == 0{
-            merged.push((sign, a, n));
+            merged.push((a, n));
             continue;
         }
         let index = merged.len()-1;
-        if n == merged[index].2{
-            if (!sign) && (!merged[index].0){
-                merged[index] = (false, a + merged[index].1, n);
-            }else if (sign) && (merged[index].0){
-                merged[index] = (true, a + merged[index].1, n);
-            }else{
-                let mut new_a = if (sign && merged[index].0) || (!sign && !merged[index].0){
-                    a * merged[index].1
-                }else{
-                    - a * merged[index].1
-                };
-                let mut new_sign = true;
-                if new_a < 0.0{
-                    new_sign = false;
-                    new_a = new_a + ((-2.0) * new_a);
-                }else if new_a == 0.0{
-                    merged.remove(index);
-                    continue;
-                }
-                merged[index] = (new_sign, new_a, n);
-            }
+        if n == merged[index].1{
+            merged[index] = (a + merged[index].0, n);
         }else{
-            merged.push((sign, a, n));
+            merged.push((a, n));
         }
     }
     merged

@@ -2,52 +2,40 @@ static ACCURACY:f64 = 100000.0;
 
 
 //derive a function
-pub fn derive(func:&Vec<(bool, f64, isize)>)->Vec<(bool, f64, isize)>{
+pub fn derive(func:&Vec<(f64, isize)>)->Vec<(f64, isize)>{
 
     //variables for the new function and the memory that safes the latest monomial when iterating through the monomials
-    let mut new_func:Vec<(bool, f64, isize)> = Vec::new();
-    let mut memory:(bool, f64, isize) = (true, 0.0, 0);
+    let mut new_func:Vec<(f64, isize)> = Vec::new();
+    let mut memory:(f64, isize) = (0.0, 0);
 
     //iterate through the monomials and derive them seperatly
-    for &(sign, a, n) in func{
-        if n >= 1{
-            memory.2 = n - 1;
-            memory.1 = a * (n as f64);
-            memory.0 = sign;
-            new_func.push(memory);
-        }else if n < 0{
-            memory.2 = n - 1;
-            memory.1 = - a * (n as f64);
-            memory.0 = !sign;
-            new_func.push(memory);
-        }
+    for &(a, n) in func{
+        memory.1 = n - 1;
+        memory.0 = a * (n as f64);
+        new_func.push(memory);
     }
     new_func
 }
 
 
 //get y value for a specified x value for a specified function
-pub fn get_y_for(x:f64, func:&Vec<(bool, f64, isize)>)->f64{
+pub fn get_y_for(x:f64, func:&Vec<(f64, isize)>)->f64{
     let mut result:f64 = 0.0;
-    for &(sign, a, n) in func{
-        result = if sign {
-            result + (a * x.powf(n as f64))
-        }else{
-            result - (a * x.powf(n as f64))
-        };
+    for &(a, n) in func{
+        result = result + (a * x.powf(n as f64));
     }
     result
 }
 
 
 //calculate zeros of a function via newton algorithm
-pub fn get_zeros(func:&Vec<(bool, f64, isize)>)->Vec<f64>{
+pub fn get_zeros(func:&Vec<(f64, isize)>)->Vec<f64>{
 
     //this variable stores the zeros
     let mut values:Vec<f64> = Vec::new();
 
     //if it is a linear function run newton_alg and return the value
-    if func[0].2 == 1{
+    if func[0].1 == 1{
         values.push(round(newton_alg(0.0, func)));
         return values;
 
@@ -83,9 +71,9 @@ pub fn get_zeros(func:&Vec<(bool, f64, isize)>)->Vec<f64>{
 
 
 //implementation of the newton algorithm for calculating zeros. Google if you want to know how the maths work
-fn newton_alg(x_start:f64, func:&Vec<(bool, f64, isize)>)->f64{
+fn newton_alg(x_start:f64, func:&Vec<(f64, isize)>)->f64{
     let mut x:f64 = x_start;
-    let derivative:Vec<(bool, f64, isize)> = derive(func);
+    let derivative:Vec<(f64, isize)> = derive(func);
     let mut i = 0;
     let mut x_max = 0.0;
     let mut x_min = 0.0;
@@ -114,3 +102,25 @@ fn newton_alg(x_start:f64, func:&Vec<(bool, f64, isize)>)->f64{
 fn round(num:f64)->f64{
     (num * ACCURACY).round()/ACCURACY
 }
+
+
+/*
+pub fn into_fraction_representation(func:&Vec<(f64, isize)>) -> (Vec<(f64, isize)>, Vec<(f64, isize)>) {
+    let mut negative:Vec<(bool, f64, isize)> = Vec::new();
+    let mut positive:Vec<(bool, f64, isize)> = Vec::new();
+    let mut numerator:Vec<(bool, f64, isize)> = Vec::new();
+    let mut denominator:Vec<(bool, f64, isize)> = Vec::new();
+    for (sign, a, n) in func {
+        if n < 0 {
+            negative.push((*sign, *a, -*n));
+        }else {
+            positive.push((*sign, *a, *n));
+        }
+    }
+    let highest_expo = negative[negative.len() - 1].2;
+    denominator.push(negative[negative.len() - 1]);
+    for (sign, a, n) in negative {
+    }
+    (numerator, denominator)
+}
+*/

@@ -43,7 +43,7 @@ fn main() {
 
         //store function
         }else if result == 30{
-            let response:(Vec<(bool, f64, isize)>, bool) = function_parser::parse_function(&input);
+            let response:(Vec<(f64, isize)>, bool) = function_parser::parse_function(&input);
             if response.1{
                 functions.insert(input[0..1].to_string(), response.0);
                 print_output("this function was saved to memory");
