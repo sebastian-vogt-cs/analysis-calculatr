@@ -140,6 +140,15 @@ pub fn func_to_string(func:&Vec<(f64, isize)>)->String{
 }
 
 
+pub fn fraction_to_string(func: &(Vec<(f64, isize)>, Vec<(f64, isize)>)) -> String{
+    let mut func_string: String = String::new();
+    func_string.push_str(func_to_string(&func.0).as_str());
+    func_string.push_str(" / ");
+    func_string.push_str(func_to_string(&func.1).as_str());
+    func_string
+}
+
+
 //converts an integer to a String in "superscript" representation (for eg. x²)
 fn isize_to_superscript(num:isize)->String{
     let nums:String = num.to_string();
@@ -252,4 +261,42 @@ pub fn get_f64_from_string(input:&str)->f64{
             }
         }
     x
+}
+
+
+pub fn into_fraction_representation(func:&Vec<(f64, isize)>) -> (Vec<(f64, isize)>, Vec<(f64, isize)>) {
+    let mut negative:Vec<(f64, isize)> = Vec::new();
+    let mut positive:Vec<(f64, isize)> = Vec::new();
+    let mut numerator:Vec<(f64, isize)> = Vec::new();
+    let mut denominator:Vec<(f64, isize)> = Vec::new();
+    for &(a, n) in func {
+        if n < 0 {
+            negative.push((a, -n));
+        }else {
+            positive.push((a, n));
+        }
+    }
+    let highest_expo = negative[negative.len() - 1].1;
+    let highest_expo_a = negative[negative.len() - 1].0;
+    denominator.push(negative[negative.len() - 1]);
+    for (a, n) in negative {
+        let new_a = highest_expo_a / a;
+        let new_n = highest_expo - n;
+        if new_a != 0.0 {
+            numerator.push((new_a, new_n));
+        }
+    }
+    for (a, n) in positive {
+        let new_n = n + highest_expo;
+        let new_a = a * highest_expo_a;
+        if new_a != 0.0 {
+            numerator.push((new_a, new_n));
+        }
+    }
+    if numerator.len() == 0 {
+        numerator.push((1.0, 0));
+    }
+    numerator = sort(numerator);
+    denominator = sort(denominator);
+    (numerator, denominator)
 }

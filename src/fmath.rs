@@ -102,25 +102,3 @@ fn newton_alg(x_start:f64, func:&Vec<(f64, isize)>)->f64{
 fn round(num:f64)->f64{
     (num * ACCURACY).round()/ACCURACY
 }
-
-
-/*
-pub fn into_fraction_representation(func:&Vec<(f64, isize)>) -> (Vec<(f64, isize)>, Vec<(f64, isize)>) {
-    let mut negative:Vec<(bool, f64, isize)> = Vec::new();
-    let mut positive:Vec<(bool, f64, isize)> = Vec::new();
-    let mut numerator:Vec<(bool, f64, isize)> = Vec::new();
-    let mut denominator:Vec<(bool, f64, isize)> = Vec::new();
-    for (sign, a, n) in func {
-        if n < 0 {
-            negative.push((*sign, *a, -*n));
-        }else {
-            positive.push((*sign, *a, *n));
-        }
-    }
-    let highest_expo = negative[negative.len() - 1].2;
-    denominator.push(negative[negative.len() - 1]);
-    for (sign, a, n) in negative {
-    }
-    (numerator, denominator)
-}
-*/

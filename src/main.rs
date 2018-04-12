@@ -15,6 +15,7 @@ fn main() {
     
     //here all the functions the user enter are stored in
     let mut functions = HashMap::new();
+    let mut fractions = HashMap::new();
 
     let mut stdout = stdout().into_raw_mode().unwrap();
     stdout.flush().unwrap();
@@ -45,13 +46,31 @@ fn main() {
         }else if result == 30{
             let response:(Vec<(f64, isize)>, bool) = function_parser::parse_function(&input);
             if response.1{
-                functions.insert(input[0..1].to_string(), response.0);
-                print_output("this function was saved to memory");
-                write!(stdout, "{}{}", termion::cursor::Goto(1, 1), termion::clear::All).unwrap();
-                for (name, func) in &functions{
-                    write!(stdout, "{}(x) = {} ", name, function_parser::func_to_string(func)).unwrap();
+                let mut fraction = false;
+                let response_0 = response.0.clone();
+                for (a, n) in response_0 {
+                    if n < 0 {
+                        fraction = true;
+                    }
                 }
-                write!(stdout, "{}", termion::cursor::Hide).unwrap();
+                if fraction {
+                    let function = function_parser::into_fraction_representation(&response.0);
+                    fractions.insert(input[0..1].to_string(), function);
+                    print_output("this function was saved to memory");
+                    write!(stdout, "{}{}", termion::cursor::Goto(1, 1), termion::clear::All).unwrap();
+                    for (name, func) in &fractions{
+                        write!(stdout, "{}(x) = {} ", name, function_parser::fraction_to_string(func)).unwrap();
+                    }
+                    write!(stdout, "{}", termion::cursor::Hide).unwrap();
+                } else {
+                    functions.insert(input[0..1].to_string(), response.0);
+                    print_output("this function was saved to memory");
+                    write!(stdout, "{}{}", termion::cursor::Goto(1, 1), termion::clear::All).unwrap();
+                    for (name, func) in &functions{
+                        write!(stdout, "{}(x) = {} ", name, function_parser::func_to_string(func)).unwrap();
+                    }
+                    write!(stdout, "{}", termion::cursor::Hide).unwrap();
+                }
             }else{
                 print_output("this function is not in supported notation");
             }
@@ -286,7 +305,7 @@ fn get_input()->(String, bool){
             },
             Key::Null => break,
             Key::Down      => break,
-            _              => print!("Other"),
+            _              => {},
         }
 
         // Flush again.
