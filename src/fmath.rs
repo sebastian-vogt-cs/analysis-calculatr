@@ -36,7 +36,11 @@ pub fn get_zeros(func:&Vec<(f64, isize)>)->Vec<f64>{
 
     //if it is a linear function run newton_alg and return the value
     if func[0].1 == 1{
-        values.push(round(newton_alg(0.0, func)));
+        if func.len() == 1 {
+            values.push(0.0);
+        } else {
+            values.push(- func[1].0 / func[0].0);
+        }
         return values;
 
     //else get the extrema (zeros of derivative -> recursion until derivative is x¹).
@@ -46,32 +50,41 @@ pub fn get_zeros(func:&Vec<(f64, isize)>)->Vec<f64>{
         let extrema = get_zeros(&derive(func));
         let last_extreme:f64 = extrema[extrema.len() - 1];
         let mut memory:f64 = extrema[0];
-        let new_zero = round(newton_alg(memory - 1.0, func));
-        values.push(new_zero);
+        let alg = newton_alg(memory - 1.0, func);
+        if alg.1 {
+        let new_zero = round(alg.0);
+            values.push(new_zero);
+        }
         for x in extrema{
             if (get_y_for(x, func).is_sign_positive() && !(get_y_for(memory, func).is_sign_positive())) || (!(get_y_for(x, func).is_sign_positive()) && get_y_for(memory, func).is_sign_positive()) || (get_y_for(memory, func) == 0.0) || (get_y_for(x, func) == 0.0){
-                let new_zero = round(newton_alg((x + memory) / 2.0, func));
+                let alg = newton_alg((x + memory) / 2.0, func);
+                if alg.1 {
+                    let new_zero = round(alg.0);
 
-                //check if the new zero isn't already there
-                if ((values.len() >= 1) && (new_zero != values[values.len()-1])) || (values.len() == 0){
-                    values.push(new_zero);
+                    //check if the new zero isn't already there
+                    if ((values.len() >= 1) && (new_zero != values[values.len()-1])) || (values.len() == 0){
+                        values.push(new_zero);
+                    }
                 }
             }
             memory = x;
         }
 
         //redo that process for the space after the last extreme
-        let new_zero = round(newton_alg(last_extreme + 1.0, func));
-        if ((values.len() >= 1) && (new_zero != values[values.len()-1])) || (values.len() == 0){
+        let alg = newton_alg(last_extreme + 1.0, func);
+        if alg.1 {
+            let new_zero = round(alg.0);
+            if ((values.len() >= 1) && (new_zero != values[values.len()-1])) || (values.len() == 0){
                     values.push(new_zero);
-         }
+            }
+        }
     }
     values
 }
 
 
 //implementation of the newton algorithm for calculating zeros. Google if you want to know how the maths work
-fn newton_alg(x_start:f64, func:&Vec<(f64, isize)>)->f64{
+fn newton_alg(x_start:f64, func:&Vec<(f64, isize)>)->(f64, bool){
     let mut x:f64 = x_start;
     let derivative:Vec<(f64, isize)> = derive(func);
     let mut i = 0;
@@ -91,10 +104,14 @@ fn newton_alg(x_start:f64, func:&Vec<(f64, isize)>)->f64{
             }
         }else if i == 1100{
             x = (x_max + x_min)/2.0;
-            return x
+            if get_y_for(round(x), func) == 0.0 {
+                break
+            }else {
+                return (0.0, false)
+            }
         }
     }
-    x
+    (x, true)
 }
 
 

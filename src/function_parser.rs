@@ -142,7 +142,9 @@ pub fn func_to_string(func:&Vec<(f64, isize)>)->String{
 
 pub fn fraction_to_string(func: &(Vec<(f64, isize)>, Vec<(f64, isize)>)) -> String{
     let mut func_string: String = String::new();
+    func_string.push_str("(");
     func_string.push_str(func_to_string(&func.0).as_str());
+    func_string.push_str(")");
     func_string.push_str(" / ");
     func_string.push_str(func_to_string(&func.1).as_str());
     func_string

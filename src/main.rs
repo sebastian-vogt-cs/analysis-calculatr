@@ -79,7 +79,9 @@ fn main() {
         }else if result == 20{
             if let Some(value) = functions.get(&input[0..1]) { //search for function in memory
                 print_output(&function_parser::func_to_string(value));
-            }else{
+            }else if let Some(value) = fractions.get(&input[0..1]) { //search for function in memory
+                print_output(&function_parser::fraction_to_string(value));
+            } else {
                 print_output("this function is not defined");
             }
 
@@ -87,7 +89,9 @@ fn main() {
         }else if result == 60{
             if let Some(value) = functions.get(&input[7..input.len()-3]) { //search for function in memory
                 print_output(&function_parser::func_to_string(&fmath::derive(value)));
-            }else{
+            }else if let Some(value) = fractions.get(&input[7..input.len()-3]) { //search for function in memory
+                print_output("we can't derive fractional functions yet, sorry");
+            }else {
                 print_output("this function is not defined");
             }
 
@@ -97,7 +101,9 @@ fn main() {
             if let Some(value) = functions.get(&input[0..1]) {
                 let x:f64 = function_parser::get_f64_from_string(&input[2..input.len()-1]);
                 print_output(&fmath::get_y_for(x, &value).to_string());
-            }else{
+            }else if let Some(value) = fractions.get(&input[0..1]) {
+                print_output("doesn't work with fractional functions yet, sorry");
+            }else {
                 print_output("this function is not defined");
             }
 
@@ -112,7 +118,15 @@ fn main() {
                     result.push_str(&" ");
                 }
                 print_output(&result);
-            }else{
+            }else if let Some(value) = fractions.get(&input[6..input.len()-3]) {
+                let zeros:Vec<f64> = fmath::get_zeros(&value.0);
+                let mut result:String = "".to_string();
+                for zero in zeros{
+                    result.push_str(&zero.to_string());
+                    result.push_str(&" ");
+                }
+                print_output(&result);
+            }else {
                 print_output("this function is not defined");
             }
             
